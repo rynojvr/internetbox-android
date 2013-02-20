@@ -1,0 +1,174 @@
+package com.rynojvr.android.internetbox.ui;
+
+import android.accounts.Account;
+import android.annotation.SuppressLint;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+
+import com.rynojvr.android.internetbox.BuildConfig;
+import com.rynojvr.android.internetbox.IbApplication;
+import com.rynojvr.android.internetbox.R;
+import com.rynojvr.android.internetbox.adapters.SlidingMenuListAdapter;
+import com.rynojvr.general.client.internetbox.IBClient;
+import com.slidingmenu.lib.SlidingMenu;
+import com.slidingmenu.lib.app.SlidingFragmentActivity;
+
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
+
+public class HomeActivity extends SlidingFragmentActivity {
+	
+	private final String ERROR_LOGIN_FAILED = "Incorrect user/password";
+	
+	private View headerView;
+	private IbApplication application;
+	private LayoutInflater inflater;
+	
+//	@SuppressLint("NewApi")
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
+		if (BuildConfig.DEBUG)
+			Log.d(IbApplication.KEY_LOG, "HomeActivity#onCreate");
+		
+		setContentView(R.layout.activity_main);
+		application = (IbApplication)getApplication();
+		
+		inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+		View slidingMenu = inflater.inflate(R.layout.sliding_menu, null);
+		setBehindContentView(slidingMenu);
+		
+		renderSlidingMenu();
+		
+		getSlidingMenu().setSlidingEnabled(true);
+		getSlidingMenu().setBehindOffset(R.dimen.slidingmenu_offset);
+		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+//		getSlidingMenu().setScrollX(0);
+		setSlidingActionBarEnabled(false);
+		
+		getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.rgb(47, 47, 47)));
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+	}
+	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		Crouton.cancelAllCroutons();
+	}
+	
+	private void renderSlidingMenu() {
+		if (BuildConfig.DEBUG) 
+			Log.d(IbApplication.KEY_LOG, "HomeActivity#renderSlidingMenu");
+		
+		Account current = null;
+		if (application.hasActiveAccount()) {
+			current = application.getActiveAccount();
+		} else if (application.hasDefaultAccount()) {
+			current = application.getDefaultAccount();
+		}
+		
+		if (current != null) {
+			new CheckLoggedInTask().execute(current);
+		}
+		
+		renderAccountPanel();
+	}
+	
+	private void renderAccountPanel() {
+		if (BuildConfig.DEBUG)
+			Log.d(IbApplication.KEY_LOG, "HomeActivity#renderAccountPanel");
+	
+		ListView listView = (ListView)findViewById(R.id.sliding_menu_list_view);
+		listView.removeHeaderView(headerView);
+		
+		if (application.hasActiveAccount()) {
+			Account account = application.getActiveAccount();
+			headerView = inflater.inflate(R.layout.fragment_account_info, null);
+			
+			// TODO: Add account info to view
+		} else {
+			headerView = inflater.inflate(R.layout.fragment_log_in, null);
+			
+			final EditText editTextUsername = (EditText)headerView.findViewById(R.id.fragment_log_in_edit_text_username);
+			final EditText editTextPassword = (EditText)headerView.findViewById(R.id.fragment_log_in_edit_text_password);
+			Button loginButton = (Button)headerView.findViewById(R.id.fragment_log_in_button_sign_in);
+			loginButton.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					new LogInAsyncTask().execute(
+						editTextUsername.getText().toString(),
+						editTextPassword.getText().toString()
+					);
+				}
+			});
+		}
+		
+		listView.addHeaderView(headerView);
+		listView.setAdapter(new SlidingMenuListAdapter(this));
+	}
+	
+	private class CheckLoggedInTask extends AsyncTask<Account, Void, Boolean> {
+		private Account current;
+		
+		protected Boolean doInBackground(Account... params) {
+			if (BuildConfig.DEBUG)
+				Log.d(IbApplication.KEY_LOG, "HomeActivity.CheckLoggedInTask#doInBackground");
+			
+			current = params[0];
+			return IBClient.isLoggedIn(application.getAccountInfo(current));
+		};
+		
+		@Override
+		protected void onPostExecute(Boolean isSignedIn) {
+			if (BuildConfig.DEBUG) 
+				Log.d(IbApplication.KEY_LOG, "HomeActivity.CheckLoggedInTask#onPostExecute");
+			
+			if (isSignedIn) {
+				application.setActiveAccount(current);
+				renderAccountPanel();
+			} else {
+				String username = current.name;
+				String password = application.getPassword(current);
+				new LogInAsyncTask().execute(username, password);
+			}
+		}
+	}
+	
+	private class LogInAsyncTask extends AsyncTask<String, Void, Boolean> {
+		private String username;
+		private String password;
+		
+		@Override
+		protected Boolean doInBackground(String... params) {
+			if (BuildConfig.DEBUG) 
+				Log.d(IbApplication.KEY_LOG, "HomeActivity.LogInAsyncTask#doInBackground");
+			
+			String username = params[0];
+			String password = params[1];
+			return application.signIn(username, password);
+		}
+		
+		@Override
+		protected void onPostExecute(Boolean logInSuccessful) {
+			if (BuildConfig.DEBUG)
+				Log.d(IbApplication.KEY_LOG, "HomeActivity.LogInAsyncTask#onPostExecute");
+			
+			if (logInSuccessful) {
+				// TODO: Something was supposed to go here...
+			} else {
+				Crouton.makeText(HomeActivity.this, ERROR_LOGIN_FAILED, Style.ALERT).show();
+			}
+			renderAccountPanel();
+		}
+	}
+}

@@ -1,0 +1,137 @@
+package com.rynojvr.android.internetbox.ui;
+
+import java.io.IOException;
+import java.util.List;
+
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.ActionBar.TabListener;
+import com.rynojvr.android.internetbox.R;
+import com.rynojvr.android.internetbox.ui.adapters.ChatFragmentAdapter;
+import com.rynojvr.android.internetbox.ui.adapters.ChatListAdapter;
+import com.rynojvr.general.client.internetbox.IBClient;
+import com.rynojvr.general.client.internetbox.entities.ChatTopic;
+import com.slidingmenu.lib.SlidingMenu;
+
+import static com.rynojvr.android.internetbox.ui.adapters.ChatFragmentAdapter.OnTopicSelectListener;
+
+@Deprecated
+public class ChatActivity extends BaseFragmentActivity {
+
+	private ListView listView;
+	private ActionBar actionBar;
+	private ChatFragmentAdapter chatFragmentAdapter;
+	private ViewPager viewPager;
+	private int focusedPage = 0;
+	private TabListener tabListener = new TabListener() {
+		@Override
+		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+		}
+
+		@Override
+		public void onTabSelected(Tab tab, FragmentTransaction ft) {
+			viewPager.setCurrentItem(tab.getPosition());
+		}
+
+		@Override
+		public void onTabReselected(Tab tab, FragmentTransaction ft) {
+			
+		}
+	};
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState, R.layout.activity_chat);
+		
+		final ActionBar actionBar = getSupportActionBar();
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		
+		chatFragmentAdapter = new ChatFragmentAdapter(getSupportFragmentManager());
+		
+//		Tab listTab = actionBar.newTab();
+//		actionBar.addTab(actionBar.newTab().sett, position)
+
+		
+		viewPager = (ViewPager) findViewById(R.id.chat_list_view_pager);
+		viewPager.setAdapter(chatFragmentAdapter);
+		
+		viewPager.setOnPageChangeListener(new OnPageChangeListener() {
+			@Override
+			public void onPageSelected(int position) {
+				
+				if (position > 0) {
+					if (actionBar.getNavigationItemCount() > 1) {
+//						actionBar.removeTabAt(position);
+						actionBar.getTabAt(position)
+							.setText(chatFragmentAdapter.getPageTitle(position));
+					} else {
+						actionBar.addTab(actionBar
+								.newTab()
+								.setText(chatFragmentAdapter.getPageTitle(position))
+								.setTabListener(tabListener));
+					}
+				}
+				actionBar.setSelectedNavigationItem(position);
+				focusedPage = position;
+
+				if (position == 0) {
+					getSlidingMenu().setTouchModeAbove(
+							SlidingMenu.TOUCHMODE_FULLSCREEN);
+				} else {
+					getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
+				}
+			}
+
+			@Override
+			public void onPageScrollStateChanged(int arg0) {
+			}
+
+			@Override
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+			}
+		});
+		viewPager.setCurrentItem(0);
+		
+		chatFragmentAdapter.setOnTopicSelectListener(new OnTopicSelectListener() {
+			@Override
+			public void onTopicSelect(ChatTopic topic) {
+				viewPager.setCurrentItem(1);
+			}
+		});
+		
+		for (int i = 0; i < chatFragmentAdapter.getCount(); i++) {
+			Tab tab = actionBar.newTab();
+			tab.setText(chatFragmentAdapter.getPageTitle(i))
+				.setTabListener(tabListener);
+			actionBar.addTab(tab);
+		}
+		
+//		setContentView(R.layout.activity_chat);
+	}
+	
+	@Override
+	public void onBackPressed() {
+		if (focusedPage == 0) {
+			super.onBackPressed();
+		} else {
+			viewPager.setCurrentItem(focusedPage - 1);
+		}
+	}
+	// @Override
+	// public boolean onCreateOptionsMenu(Menu menu) {
+	// // Inflate the menu; this adds items to the action bar if it is present.
+	// getMenuInflater().inflate(R.menu.activity_chat, menu);
+	// return true;
+	// }
+
+}

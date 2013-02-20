@@ -1,0 +1,5 @@
+package com.rynojvr.general.client.internetbox.entities;
+
+public class Episode {
+
+}

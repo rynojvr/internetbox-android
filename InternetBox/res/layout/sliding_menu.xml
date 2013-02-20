@@ -1,0 +1,36 @@
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/InternetBoxBaseTheme"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true" >
+
+    <!--
+         <TextView 
+        android:id="@+id/blah"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center_horizontal"
+        android:text="asdf"
+        android:textColor="#99CC00" />
+    -->
+
+    <ListView
+        android:id="@+id/sliding_menu_account_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+       <!--  <fragment
+            android:id="@+id/sliding_menu_account_fragment_log_in_fragment"
+            android:name="com.rynojvr.android.internetbox.fragments.LogInFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" /> -->
+    </ListView>
+
+    <ListView
+        android:id="@+id/sliding_menu_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/sliding_menu_account_fragment" />
+
+</RelativeLayout> <!-- </ScrollView> -->

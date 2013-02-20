@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="com.rynojvr.general.client.internetbox.entities.enums.StaffMembers"/>
+<fullyQualifiedTypeName name="com.google.gson.annotations.SerializedName"/>
+<fullyQualifiedTypeName name="com.rynojvr.android.internetbox.ui.AddAccountActivity"/>
+<fullyQualifiedTypeName name="com.rynojvr.general.client.internetbox.entities.enums.Cast"/>
+<fullyQualifiedTypeName name="java.net.URL"/>
+<fullyQualifiedTypeName name="android.os.AsyncTask"/>
+<fullyQualifiedTypeName name="android.widget.ListView"/>
+<fullyQualifiedTypeName name="android.widget.ProgressBar"/>
+<fullyQualifiedTypeName name="com.rynojvr.android.internetbox.R.id"/>
+<fullyQualifiedTypeName name="android.widget.Toast"/>
+<fullyQualifiedTypeName name="com.rynojvr.android.internetbox.ui.fragments.EpisodeArchiveFragment.LoadEpisodesAsyncTask"/>
+<fullyQualifiedTypeName name="com.rynojvr.android.internetbox.R.layout"/>
+<fullyQualifiedTypeName name="android.widget.BaseExpandableListAdapter"/>
+<fullyQualifiedTypeName name="android.widget.ExpandableListView"/>
+<fullyQualifiedTypeName name="java.util.List"/>
+<fullyQualifiedTypeName name="com.rynojvr.general.client.internetbox.entities.Episode"/>
+<fullyQualifiedTypeName name="java.util.ArrayList"/>
+<fullyQualifiedTypeName name="java.lang.reflect.Array"/>
+<fullyQualifiedTypeName name="java.util.Arrays"/>
+<fullyQualifiedTypeName name="android.content.Context"/>
+<fullyQualifiedTypeName name="com.rynojvr.android.internetbox.R"/>
+<fullyQualifiedTypeName name="com.rynojvr.android.internetbox.ui.adapters.EpisodeArchiveAdapter"/>
+<fullyQualifiedTypeName name="com.rynojvr.android.internetbox.BuildConfig"/>
+<fullyQualifiedTypeName name="com.rynojvr.general.client.internetbox.IBClient"/>
+<fullyQualifiedTypeName name="com.rynojvr.android.internetbox.IbApplication"/>
+<fullyQualifiedTypeName name="android.util.Log"/>
+</qualifiedTypeNameHistroy>

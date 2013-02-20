@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+	<Button 
+	    android:id="@+id/fragment_episode_archive_item_button"
+	    android:layout_width="40dp"
+	    android:layout_height="wrap_content"
+	    android:layout_alignBottom="@+id/fragment_episode_archive_item_pin_download"
+	    android:layout_alignParentLeft="true"
+	    android:layout_alignParentTop="true"
+	    android:focusable="false"
+	    android:text="42" />
+	
+	<!--   <ImageView
+        android:id="@+id/podcast_list_item_unlistened_overlay"
+        style="@style/UnlistenedOverlayStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/podcast_list_item_button_number"
+        android:layout_alignRight="@id/podcast_list_item_button_number"
+        android:contentDescription="@string/podcast_item_list_content_desc_unlistened_overlay"
+        android:focusable="false"
+        android:visibility="invisible" /> -->
+    
+    <com.rynojvr.android.internetbox.ui.elements.PinProgressButton
+        />
+    
+</RelativeLayout>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/InternetBoxChatListItemTheme"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="80dp" >
+
+    <ImageView
+        android:id="@+id/fragment_chat_detail_replies_item_image_avatar"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_launcher" />
+
+    <TextView
+        android:id="@+id/fragment_chat_detail_replies_item_text_created_by"
+        style="@style/InternetBoxChatListItemTheme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+       	android:layout_alignTop="@id/fragment_chat_detail_replies_item_image_avatar"
+        android:layout_toRightOf="@id/fragment_chat_detail_replies_item_image_avatar"
+        android:text="created_by"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/fragment_chat_detail_replies_item_text_content"
+        style="@style/InternetBoxBaseTheme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/fragment_chat_detail_replies_item_text_created_by"
+        android:layout_below="@id/fragment_chat_detail_replies_item_text_created_by"
+        android:paddingBottom="8dp"
+        android:paddingRight="8dp"
+        android:text="content" />
+
+</RelativeLayout>

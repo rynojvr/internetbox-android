@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    style="@style/InternetBoxChatListItemTheme" >
+
+    <ImageView
+        android:id="@+id/fragment_chat_detail_fragment_topic_image_avatar"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="16dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_launcher"
+        android:layout_marginTop="16dp" />
+    
+    <TextView
+        android:id="@+id/fragment_chat_detail_fragment_topic_text_created_by"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+		android:layout_toRightOf="@id/fragment_chat_detail_fragment_topic_image_avatar"
+		android:text="created_by"
+		android:layout_marginLeft="8dp"
+		android:layout_alignTop="@id/fragment_chat_detail_fragment_topic_image_avatar"
+		android:textSize="12sp"
+		style="@style/InternetBoxChatListItemTheme" />
+
+    <TextView
+        android:id="@+id/fragment_chat_detail_fragment_topic_text_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/fragment_chat_detail_fragment_topic_text_created_by"
+        android:layout_below="@+id/fragment_chat_detail_fragment_topic_text_created_by"
+        android:text="title"
+        android:textSize="22sp"
+        style="@style/InternetBoxChatListItemTheme"  />
+    
+    <TextView
+        android:id="@+id/fragment_chat_detail_fragment_topic_text_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/fragment_chat_detail_fragment_topic_text_created_by"
+        android:layout_below="@+id/fragment_chat_detail_fragment_topic_text_title"
+        android:text="content"
+        android:paddingBottom="8dp"
+        android:paddingRight="8dp"
+        style="@style/InternetBoxBaseTheme" />"
+
+</RelativeLayout>

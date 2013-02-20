@@ -1,0 +1,8 @@
+package com.rynojvr.android.internetbox.ui.fragments;
+
+import com.actionbarsherlock.app.SherlockFragment;
+
+public class EpisodeListFragment extends SherlockFragment {
+
+	
+}

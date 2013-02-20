@@ -1,0 +1,38 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="AppTheme" parent="android:Theme.Light" />
+
+    <style name="InternetBoxBaseTheme" parent="AppTheme">
+        <item name="android:background">#1F1F1F</item>
+        <item name="android:textColor">#BBB</item>
+    </style>
+
+    <style name="InternetBoxMenuTheme" parent="InternetBoxBaseTheme">
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    <style name="InternetBoxChatListTheme" parent="InternetBoxBaseTheme">
+        <item name="android:background">#464646</item>
+    </style>
+
+    <style name="InternetBoxChatListItemTheme" parent="InternetBoxBaseTheme">
+        <item name="android:textColor">#C37700</item>
+    </style>
+
+    <style name="InternetBoxButtonTheme" parent="AppTheme">
+        <item name="android:background">#C37700</item>
+        <item name="android:textColor">#BBB</item>
+        <item name="android:layout_margin">4dp</item>
+    </style>
+
+    <style name="InternetBoxEditTextTheme" parent="AppTheme">
+        <item name="android:textColor">#BBB</item>
+    </style>
+
+    <style name="PinProgressButton">
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:background">?android:selectableItemBackground</item>
+    </style>
+
+</resources>

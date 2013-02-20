@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp" >
+
+    <EditText
+        android:id="@+id/fragment_log_in_edit_text_username"
+        style="@style/InternetBoxEditTextTheme"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:ems="10"
+        android:hint="Username"
+        android:singleLine="true" >
+    </EditText>
+
+    <EditText
+        android:id="@+id/fragment_log_in_edit_text_password"
+        style="@style/InternetBoxEditTextTheme"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/fragment_log_in_edit_text_username"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
+        android:ems="10"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:singleLine="true" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/fragment_log_in_edit_text_password"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/fragment_log_in_button_sign_in"
+            style="@style/InternetBoxButtonTheme"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Sign In" />
+
+        <Button
+            android:id="@+id/fragment_log_in_button_sign_up"
+            style="@style/InternetBoxButtonTheme"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Sign Up" />
+    </LinearLayout>
+
+</RelativeLayout>

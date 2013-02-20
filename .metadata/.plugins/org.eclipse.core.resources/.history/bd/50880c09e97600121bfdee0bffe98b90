@@ -1,0 +1,17 @@
+package com.rynojvr.general.client.internetbox.entities;
+
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
+import com.rynojvr.general.client.internetbox.entities.enums.StaffMembers;
+
+public class Episode {
+	private int id;
+	private String description;
+	@SerializedName("audio_url")
+	private String audioURL;
+	@SerializedName("staff_members")
+	private List<StaffMembers> staffMembers;
+	@SerializedName("link_dump")
+	private List<Link> linkDump;
+}

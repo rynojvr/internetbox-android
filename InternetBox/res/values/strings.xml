@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Internet Box</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">Internet Box</string>
+    <string name="title_activity_home_page">Home</string>
+    <string name="contentDesc_sliding_menu_item_image">Menu Item Image</string>
+    <string name="title_activity_base">BaseActivity</string>
+    <string name="title_activity_chat">CHAT</string>
+    <string name="title_activity_add_account">Add Account</string>
+
+</resources>

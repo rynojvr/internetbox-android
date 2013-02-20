@@ -1,0 +1,28 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/InternetBoxBaseTheme"
+    android:layout_width="fill_parent"
+    android:layout_height="48dp"
+    android:minHeight="48dp"
+    android:descendantFocusability="blocksDescendants" >
+
+    <ImageView
+        android:id="@+id/sliding_menu_item_image"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_centerVertical="true"
+        android:layout_margin="8dp"
+        android:contentDescription="@string/contentDesc_sliding_menu_item_image"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_menu_ask_a_question" />
+
+    <TextView
+        android:id="@+id/sliding_menu_item_text"
+        style="@style/InternetBoxMenuTheme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:gravity="center_vertical"
+        android:layout_toRightOf="@id/sliding_menu_item_image"
+        android:text="Option" />
+
+</RelativeLayout> <!-- </ScrollView> -->

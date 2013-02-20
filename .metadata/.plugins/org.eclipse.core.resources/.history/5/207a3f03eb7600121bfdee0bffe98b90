@@ -1,0 +1,220 @@
+package com.rynojvr.general.client.internetbox;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.jsoup.Connection.Method;
+import org.jsoup.Jsoup;
+import org.jsoup.helper.HttpConnection;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
+import com.rynojvr.android.internetbox.ui.AddAccountActivity;
+import com.rynojvr.general.client.internetbox.entities.ChatReply;
+import com.rynojvr.general.client.internetbox.entities.ChatTopic;
+import com.rynojvr.general.client.internetbox.entities.Episode;
+import com.rynojvr.general.client.internetbox.entities.Question;
+
+
+public class IBClient {
+	
+	private static String enpointDestination = "http://ibscraper.herokuapp.com";
+//	private static String chatTopic
+	private static Gson gson = new Gson();
+	
+	private static List<Episode> episodes = new ArrayList<Episode>() {{
+		add(new Episode() {{
+			id = 5;
+		}});
+	}};
+	
+	public static boolean sendReply(int topicId, String message, Map<String, String> userdata) {
+		try {
+			Document doc = Jsoup.connect("http://internetboxpodcast.com/chat/post-reply.php?id=" + topicId)
+				.userAgent("Dashie FTW!")
+				.data("content", message)
+				.cookies(userdata)
+				.post();
+			
+			Log.d("IB", "Send Reply response: " + doc.toString());
+		} catch (IOException e) {
+			Log.d("IB", "sendReply[" + topicId + "] error: " + e);
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Attempts to sign in using the provided credentials. If there is an error
+	 * then null is returned
+	 * 
+	 * @param username
+	 * @param password
+	 * @return - A map containing 'k' and 'user', or null sign-in failed.
+	 * @throws IOException
+	 */
+	public static Map<String, String> signIn(String username, String password) {
+		org.jsoup.Connection.Response response;
+		try {
+			response = HttpConnection
+					.connect("http://internetboxpodcast.com/sign-in.php")
+					.userAgent("Dashie FTW!")
+					.data("return", "http://internetboxpodcast.com")
+					.data("username", username).data("password", password)
+					.method(Method.POST).execute();
+		} catch (Exception e) {
+			Log.d("IB", e.toString());
+			return null;
+		}
+		
+		Map<String, String> result = response.cookies();
+		if (result.containsKey("k") && result.containsKey("user")) {
+			Log.d("IBClient", "K: " + result.get("k"));
+			Log.d("IBClient", "User: " + result.get("user"));
+//			isLoggedIn(result);
+			return result;
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * Requests the home page of IB, and checks if the user identified by
+	 * 'accountInfo' is logged in.
+	 * 
+	 * @param accountInfo
+	 *            - A map containing 'k' and 'user'
+	 * @return 
+	 * 		Whether the provided credentials are logged in. 
+	 */
+	public static boolean isLoggedIn(Map<String, String> accountInfo) {
+		Document doc;
+		try {
+			doc = Jsoup.connect("http://internetboxpodcast.com")
+					.userAgent("Dashie FTW!")
+					.cookies(accountInfo)
+					.get();
+			
+			Log.d("IBClient", "Isloggedin: " + doc.html());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		Element ele = doc.select("#topRight > .m-btn-group > [class='m-btn orange']").first();
+		Log.d("IBClient", "isLoggedIn[ele]: " + ele);
+		boolean result = (ele != null && ele.text().length() != 0);
+		Log.d("IBClient", "result: " + result);
+//		Log.d("IBClient", "isLoggedIn[ele.text()]: " + ele.text());
+		return result;
+	}
+	
+	/**
+	 * Returns the first 10 Chat Topics, ordered by most recently modified.
+	 * 
+	 * @return
+	 * @throws IOException 
+	 */
+	public static List<ChatTopic> getTopChatTopics() throws IOException {
+		return getChatTopics(0, 10);
+	}
+	
+	/**
+	 * Returns the Chat Topics from startIndex to endIndex
+	 * 
+	 * @param startIndex
+	 * @param endIndex
+	 * @return
+	 * @throws IOException
+	 */
+	public static List<ChatTopic> getChatTopics(int startIndex, int endIndex) throws IOException {
+		Document doc = Jsoup.connect(enpointDestination + "/chat/" + startIndex + "/" + endIndex).get();
+		String jsonString = doc.text();
+		System.out.println(jsonString);
+		ChatTopicResponseWrapper wrapper = gson.fromJson(jsonString, ChatTopicResponseWrapper.class);
+		return wrapper.chatTopics;
+	}
+	
+	/**
+	 * Returns the Chat Topic with the given ID, and up to the first 25 replies.
+	 * 
+	 * @param id
+	 * @return
+	 * @throws IOException
+	 */
+	public static ChatTopic getChatTopic(int id) throws IOException {
+		Document doc = Jsoup.connect(enpointDestination + "/chat/" + id).get();
+		String jsonString = doc.text();
+		Log.d("IB CHAT TOPIC", jsonString);
+		ChatTopic topic = gson.fromJson(jsonString, ChatTopic.class);
+		return topic;
+	}
+	
+	/**
+	 * Gets the replies for the Chat Topic with the given id, starting from
+	 * 'startIndex', to 'endIndex'.
+	 * 
+	 * @param id
+	 * @param startIndex
+	 * @param endIndex
+	 * @return
+	 * @throws IOException
+	 */
+	public static List<ChatReply> getChatTopicReplies(int id, int startIndex, int endIndex) throws IOException {
+		Document doc = Jsoup.connect(enpointDestination + "/chat/" + id + "/" + startIndex + "/" + endIndex).get();
+		String jsonString = doc.text();
+		ChatTopic topic = gson.fromJson(jsonString, ChatTopic.class);
+		return topic.getReplies();
+	}
+	
+	public static Question getQuestion(int id) throws IOException {
+		Document doc = Jsoup.connect(enpointDestination + "/question/" + id).get();
+		String jsonString = doc.text();
+//		System.out.println(jsonString);
+		Question question = gson.fromJson(jsonString, Question.class);
+		return question;
+	}
+	
+	public static List<Question> getTopQuestions() throws IOException {
+		return getQuestions(0, 10);
+	}
+	
+	/**
+	 * Returns a list of top rated questions from startIndex to endIndex
+	 * 
+	 * @param startIndex
+	 * @param endIndex
+	 * @return
+	 * @throws IOException
+	 */
+	public static List<Question> getQuestions(int startIndex, int endIndex) throws IOException {
+		Document doc = Jsoup.connect(enpointDestination + "/question/top/" + startIndex + "/" + endIndex).get();
+		String jsonString = doc.text();
+		System.out.println(jsonString);
+		QuestionResponseWrapper wrapper = gson.fromJson(jsonString, QuestionResponseWrapper.class);
+		return wrapper.questions;
+	}
+	
+	public static List<Question> getQuestions(String crewMemberName, int startIndex, int endIndex) throws IOException {
+		Document doc = Jsoup.connect(enpointDestination + "/question/" + crewMemberName + "/" + startIndex + "/" + endIndex).get();
+		String jsonString = doc.text();
+		QuestionResponseWrapper wrapper = gson.fromJson(jsonString, QuestionResponseWrapper.class);
+		return wrapper.questions;
+	}
+	
+	private class ChatTopicResponseWrapper {
+		@SerializedName("chat_topics")
+		public List<ChatTopic> chatTopics;	
+	}
+	
+	private class QuestionResponseWrapper {
+		public List<Question> questions;
+	}
+}

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/InternetBoxChatListTheme"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" xmlns:tools="http://schemas.android.com/tools">
+    
+  <fragment
+      android:id="@+id/frag"
+      android:name="com.rynojvr.android.internetbox.fragments.ChatDetailFooterFragment"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_alignParentBottom="true" 
+      android:tag="fragTag"/>
+
+  <ListView
+      android:id="@+id/fragment_chat_detail_list_replies"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_alignParentLeft="true"
+      android:layout_alignParentTop="true" 
+      android:layout_above="@id/frag">
+  </ListView>
+
+</RelativeLayout>

@@ -1,0 +1,36 @@
+package com.rynojvr.general.client.internetbox.entities;
+
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
+import com.rynojvr.general.client.internetbox.entities.enums.Cast;
+
+public class Episode {
+	public final int id;
+	private String description;
+	@SerializedName("audio_url")
+	private String audioUrl;
+	private List<Cast> cast;
+	@SerializedName("link_dump")
+	private List<Link> linkDump;
+	
+	public int getId() {
+		return id;
+	}
+	
+	public String getDescription() {
+		return description;
+	}
+	
+	public String getAudioUrl() {
+		return audioUrl;
+	}
+	
+	public List<Cast> getCast() {
+		return cast;
+	}
+	
+	public List<Link> getLinkDump() {
+		return linkDump;
+	}
+}

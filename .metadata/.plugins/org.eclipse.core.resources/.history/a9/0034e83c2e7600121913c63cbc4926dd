@@ -1,0 +1,347 @@
+package com.rynojvr.android.podcaster.ui.adapters;
+
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.DownloadManager;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
+import android.widget.ExpandableListView;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.rynojvr.android.podcaster.R;
+import com.rynojvr.android.podcaster.asynctasks.SavePodcastTask;
+import com.rynojvr.android.podcaster.helpers.FileHelper;
+import com.rynojvr.android.podcaster.models.Podcast;
+import com.rynojvr.android.podcaster.models.PodcastItem;
+import com.rynojvr.android.podcaster.ui.PodcastPlayActivity;
+import com.rynojvr.android.podcaster.ui.elements.PinProgressButton;
+
+// TODO: Add DateFormatter 
+public class PodcastAdapter extends BaseExpandableListAdapter {
+
+	private Podcast podcast;
+	private LayoutInflater inflater;
+	private Activity parentActivity;
+	private ExpandableListView listView;
+	private int apiVersionNumber;
+	private int lastExpandedGroupPosition;
+	private int[] downloadProgress;
+	private NotificationManager notificationManager;
+	private Notification.Builder notiBuilder;
+	private DownloadManager downloadManager;
+
+	public PodcastAdapter(Podcast podcast, Activity parentActivity,
+			ExpandableListView listView) {
+		this.listView = listView;
+		this.podcast = podcast;
+		this.inflater = (LayoutInflater) parentActivity
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		this.parentActivity = parentActivity;
+		apiVersionNumber = android.os.Build.VERSION.SDK_INT;
+		this.notificationManager = (NotificationManager) parentActivity
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+
+		if (apiVersionNumber >= android.os.Build.VERSION_CODES.HONEYCOMB)
+			getNotificationBuilder();
+
+		downloadProgress = new int[podcast.getItems().size()];
+		for (int i = 0; i < downloadProgress.length; i++)
+			downloadProgress[i] = -1;
+
+		FileHelper.SavePodcast(podcast);
+		updateTotalListenedCount();
+
+		downloadManager = (DownloadManager) parentActivity
+				.getSystemService(Context.DOWNLOAD_SERVICE);
+	}
+
+//	@TargetApi(11)
+	private void getNotificationBuilder() {
+		this.notiBuilder = new Notification.Builder(parentActivity);
+	}
+
+	public Object getChild(int groupPosition, int childPosition) {
+		return podcast.getItems().get(groupPosition);
+	}
+
+	public long getChildId(int groupPosition, int childPosition) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public View getChildView(int groupPosition, int childPosition,
+			boolean isLastChild, View convertView, ViewGroup parent) {
+		if (convertView == null) {
+			convertView = inflater.inflate(
+					R.layout.activity_podcastitem_detail, parent, false);
+		}
+
+		PodcastItem currentItem = (PodcastItem) getChild(groupPosition,
+				childPosition);
+
+		TextView description = (TextView) convertView
+				.findViewById(R.id.podcastitem_detail_description);
+		description.setText(currentItem.description);
+
+		return convertView;
+	}
+
+	/**
+	 * Will always be 1; Child view is the detail of the parent
+	 */
+	public int getChildrenCount(int groupPosition) {
+		return 1;
+	}
+
+	public Object getGroup(int groupPosition) {
+		return podcast.getItems().get(groupPosition);
+	}
+
+	public int getGroupCount() {
+		return podcast.getItems().size();
+	}
+
+	public long getGroupId(int groupPosition) {
+		return groupPosition;
+	}
+
+	// TODO: Fix unlistened overlay fading out if listened.
+	public View getGroupView(final int groupPosition, boolean isExpanded,
+			View convertView, ViewGroup parent) {
+
+		if (convertView == null) {
+			convertView = inflater.inflate(R.layout.activity_podcast_list_item,
+					null);
+		}
+
+		PodcastItem currentItem = (PodcastItem) getGroup(groupPosition);
+
+		renderListenedOverlay(convertView, currentItem.listened);
+
+		TextView textTitle = (TextView) convertView
+				.findViewById(R.id.podcast_list_item_text_title);
+		textTitle.setText(currentItem.title);
+
+		final View viewClosure = convertView;
+		Button numberButton = (Button) convertView
+				.findViewById(R.id.podcast_list_item_button_number);
+		numberButton.setText("" + (groupPosition + 1));
+		numberButton.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				PodcastItem podcastItem = (PodcastItem) getGroup(groupPosition);
+				podcastItem.listened = !podcastItem.listened;
+
+				renderListenedOverlay(viewClosure, podcastItem.listened);
+
+				new SavePodcastTask().execute(podcast);
+
+				updateTotalListenedCount();
+			}
+		});
+
+		configDownloadPin(convertView, currentItem, groupPosition);
+
+		ImageButton mediaPlay = (ImageButton) convertView
+				.findViewById(R.id.podcast_list_item_media_play);
+		mediaPlay.setVisibility((downloadProgress[groupPosition] == 100)
+				? View.VISIBLE
+				: View.GONE);
+		mediaPlay.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent();
+				intent.setClass(parentActivity, PodcastPlayActivity.class);
+				intent.putExtra("file", FileHelper.getPodcastFile(podcast, groupPosition));
+				parentActivity.startActivity(intent);
+			}
+		});
+		
+		TextView textDate = (TextView)convertView.findViewById(R.id.podcast_list_item_text_date);
+		textDate.setText(currentItem.pubDate.toString());
+
+		return convertView;
+	}
+
+	private void configDownloadPin(View convertView, PodcastItem currentItem,
+			final int groupPosition) {
+		PinProgressButton downloadPin = (PinProgressButton) (convertView
+				.findViewById(R.id.podcast_list_item_pin_download));
+		downloadPin.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				downloadPinClicked(groupPosition, (PinProgressButton) v);
+			}
+		});
+		downloadPin.setChecked(currentItem.pinned);
+
+		downloadPin.setProgress(getDownloadProgress(groupPosition));
+	}
+
+	public boolean hasStableIds() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean isChildSelectable(int groupPosition, int childPosition) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void onGroupExpanded(int groupPosition) {
+		if (groupPosition != lastExpandedGroupPosition) {
+			if (lastExpandedGroupPosition >= 0)
+				listView.collapseGroup(lastExpandedGroupPosition);
+		}
+
+		super.onGroupExpanded(groupPosition);
+		lastExpandedGroupPosition = groupPosition;
+	}
+
+	private void renderListenedOverlay(View view, boolean listened) {
+		ImageView unlistenedOverlay = (ImageView) view
+				.findViewById(R.id.podcast_list_item_unlistened_overlay);
+
+		unlistenedOverlay.setVisibility(listened ? View.GONE : View.VISIBLE);
+	}
+
+	@SuppressLint("NewApi")
+	private void downloadPinClicked(int position, PinProgressButton downloadPin) {
+		PodcastItem podcastItem = (PodcastItem) getGroup(position);
+		podcastItem.pinned = downloadPin.isChecked();
+
+		FileHelper.SavePodcast(podcast);
+
+		if (podcastItem.pinned) {
+			FileHelper.DownloadPodcastItem(podcast, position, this, position);
+
+			// File file = FileHelper.getPodcastFile(podcast, position);
+			// String path =
+			// file.getPath().replaceFirst(parentActivity.getExternalFilesDir(null).getPath(),
+			// "");
+			//
+			// if (BuildConfig.DEBUG)
+			// Log.d("DownloadManagerIng", path);
+			//
+			// Request request = new
+			// Request(Uri.parse(podcastItem.enclosureUrl));
+			// request.setAllowedNetworkTypes(Request.NETWORK_WIFI)
+			// .setTitle(podcastItem.title)
+			// .setDescription(podcastItem.description)
+			// .setNotificationVisibility(Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+			// .setDestinationInExternalFilesDir(parentActivity, null, path);
+			// downloadManager.enqueue(request);
+		}
+	}
+
+	private void updateTotalListenedCount() {
+		TextView podcastListUnlistenedOverlay = (TextView) listView
+				.findViewById(R.id.podcast_list_header_unlistened_overlay);
+
+		int count = 0;
+		for (PodcastItem podcastItem : podcast.getItems()) {
+			count += (podcastItem.listened) ? 0 : 1;
+		}
+
+		if (count > 0) {
+			podcastListUnlistenedOverlay.setVisibility(View.VISIBLE);
+			podcastListUnlistenedOverlay.setText(String.valueOf(count));
+		} else {
+			podcastListUnlistenedOverlay.setVisibility(View.INVISIBLE);
+		}
+	}
+
+	private int getDownloadProgress(int index) {
+		if (downloadProgress[index] >= 0)
+			return downloadProgress[index];
+
+		downloadProgress[index] = FileHelper.getPodcastProgress(podcast, index);
+		return downloadProgress[index];
+	}
+
+	public void updateDownloadProgress(int index, int newProgress) {
+		int previous = downloadProgress[index];
+
+		// Log.d("Downloading", "new progress: " + newProgress);
+
+		if (newProgress > previous) {
+			downloadProgress[index] = newProgress;
+
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+				buildJellybeanUpdate(newProgress);
+			} else {
+				buildLegacyUpdate(newProgress);
+			}
+
+			notifyDataSetChanged();
+		}
+	}
+
+	@TargetApi(16)
+	private void buildJellybeanUpdate(int newProgress) {
+		if (newProgress < 99) {
+			// Build Download Update Notification
+			Intent intent = new Intent(parentActivity,
+					PodcastPlayActivity.class);
+			PendingIntent pIntent = PendingIntent.getActivity(parentActivity,
+					0, intent, 0);
+
+			Notification noti = notiBuilder
+					.setContentTitle("New mail from test@gmail.com")
+					.setProgress(100, newProgress, false)
+					.setContentText("Subject")
+					.setSmallIcon(R.drawable.ic_download)
+					.setContentIntent(pIntent).build();
+			noti.flags |= Notification.FLAG_ONGOING_EVENT;
+			notificationManager.notify(0, noti);
+		} else {
+			// Build Download Finished Notification
+			Intent intent = new Intent(parentActivity,
+					PodcastPlayActivity.class);
+			PendingIntent pIntent = PendingIntent.getActivity(parentActivity,
+					0, intent, 0);
+
+			// Notification noti =
+			// notiBuilder.setContentTitle("New mail from test@gmail.com")
+			// .setProgress(100, newProgress, false)
+			// .setContentText("Subject").setSmallIcon(R.drawable.icon)
+			// .setContentIntent(pIntent).build();
+			Notification noti = new Notification.Builder(parentActivity)
+					.setContentTitle("All done!").setContentText("Finished")
+					.setSmallIcon(R.drawable.ic_download).build();
+
+			// noti.flags |= Notification.FLAG_ONGOING_EVENT;
+			notificationManager.notify(0, noti);
+		}
+	}
+
+	private void buildLegacyUpdate(int newProgress) {
+
+	}
+
+	private class UpdateProgressTask extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			return null;
+		}
+
+		@Override
+		protected void onProgressUpdate(Void... values) {
+			super.onProgressUpdate(values);
+		}
+	}
+}
