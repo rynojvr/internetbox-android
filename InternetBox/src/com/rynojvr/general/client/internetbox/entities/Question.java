@@ -26,7 +26,7 @@ public class Question {
 		return id;
 	}
 	
-	public String getCreatedBy() {
+	public String getCreatedBy() {	
 		return createdBy;
 	}
 	

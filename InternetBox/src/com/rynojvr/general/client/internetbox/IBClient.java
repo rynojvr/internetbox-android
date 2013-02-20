@@ -27,7 +27,7 @@ import com.rynojvr.general.client.internetbox.entities.enums.Cast;
 
 public class IBClient {
 	
-	private static String enpointDestination = "http://ibscraper.herokuapp.com";
+	private static String endpointDestination = "http://ibscraper.herokuapp.com";
 //	private static String chatTopic
 	private static Gson gson = new Gson();
 	
@@ -256,7 +256,7 @@ public class IBClient {
 	 * @throws IOException
 	 */
 	public static List<ChatTopic> getChatTopics(int startIndex, int endIndex) throws IOException {
-		Document doc = Jsoup.connect(enpointDestination + "/chat/" + startIndex + "/" + endIndex).get();
+		Document doc = Jsoup.connect(endpointDestination + "/chat/" + startIndex + "/" + endIndex).get();
 		String jsonString = doc.text();
 		System.out.println(jsonString);
 		ChatTopicResponseWrapper wrapper = gson.fromJson(jsonString, ChatTopicResponseWrapper.class);
@@ -271,7 +271,7 @@ public class IBClient {
 	 * @throws IOException
 	 */
 	public static ChatTopic getChatTopic(int id) throws IOException {
-		Document doc = Jsoup.connect(enpointDestination + "/chat/" + id).get();
+		Document doc = Jsoup.connect(endpointDestination + "/chat/" + id).get();
 		String jsonString = doc.text();
 		Log.d("IB CHAT TOPIC", jsonString);
 		ChatTopic topic = gson.fromJson(jsonString, ChatTopic.class);
@@ -279,6 +279,11 @@ public class IBClient {
 	}
 	
 	public static List<Episode> getEpisodes(int startIndex, int endIndex) throws IOException {
+//		return episodes;
+		
+		Document doc = Jsoup.connect(endpointDestination + "/episode/" + startIndex + "/" + endIndex).get();
+		String jsonString = doc.text();
+		List<Episode> episodes = gson.fromJson(jsonString, EpisodeResponseWrapper.class).episodes;
 		return episodes;
 	}
 	
@@ -293,14 +298,14 @@ public class IBClient {
 	 * @throws IOException
 	 */
 	public static List<ChatReply> getChatTopicReplies(int id, int startIndex, int endIndex) throws IOException {
-		Document doc = Jsoup.connect(enpointDestination + "/chat/" + id + "/" + startIndex + "/" + endIndex).get();
+		Document doc = Jsoup.connect(endpointDestination + "/chat/" + id + "/" + startIndex + "/" + endIndex).get();
 		String jsonString = doc.text();
 		ChatTopic topic = gson.fromJson(jsonString, ChatTopic.class);
 		return topic.getReplies();
 	}
 	
 	public static Question getQuestion(int id) throws IOException {
-		Document doc = Jsoup.connect(enpointDestination + "/question/" + id).get();
+		Document doc = Jsoup.connect(endpointDestination + "/question/" + id).get();
 		String jsonString = doc.text();
 //		System.out.println(jsonString);
 		Question question = gson.fromJson(jsonString, Question.class);
@@ -320,7 +325,7 @@ public class IBClient {
 	 * @throws IOException
 	 */
 	public static List<Question> getQuestions(int startIndex, int endIndex) throws IOException {
-		Document doc = Jsoup.connect(enpointDestination + "/question/top/" + startIndex + "/" + endIndex).get();
+		Document doc = Jsoup.connect(endpointDestination + "/question/top/" + startIndex + "/" + endIndex).get();
 		String jsonString = doc.text();
 		System.out.println(jsonString);
 		QuestionResponseWrapper wrapper = gson.fromJson(jsonString, QuestionResponseWrapper.class);
@@ -328,7 +333,7 @@ public class IBClient {
 	}
 	
 	public static List<Question> getQuestions(String crewMemberName, int startIndex, int endIndex) throws IOException {
-		Document doc = Jsoup.connect(enpointDestination + "/question/" + crewMemberName + "/" + startIndex + "/" + endIndex).get();
+		Document doc = Jsoup.connect(endpointDestination + "/question/" + crewMemberName + "/" + startIndex + "/" + endIndex).get();
 		String jsonString = doc.text();
 		QuestionResponseWrapper wrapper = gson.fromJson(jsonString, QuestionResponseWrapper.class);
 		return wrapper.questions;
@@ -341,5 +346,9 @@ public class IBClient {
 	
 	private class QuestionResponseWrapper {
 		public List<Question> questions;
+	}
+	
+	private class EpisodeResponseWrapper {
+		public List<Episode> episodes;
 	}
 }
